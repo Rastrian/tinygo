@@ -1,0 +1,39 @@
+{
+  "llvm-target": "aarch64",
+  "build-tags": ["nintendoswitch", "linux", "arm64"],
+  "goos": "linux",
+  "goarch": "arm64",
+  "compiler": "aarch64-none-elf-gcc",
+  "linker": "aarch64-none-elf-ld",
+  "rtlib": "compiler-rt",
+  "libc": "picolibc",
+  "gc": "conservative",
+  "cflags": [
+    "-march=armv8-a+crc+crypto",
+    "-mtune=cortex-a57",
+    "-mtp=soft",
+    "-fPIE",
+    "-g",
+    "-Wall",
+    "-ffunction-sections",
+    "-Wl,-Map,$(notdir $*.map)",
+    "-D__SWITCH__",
+    "-fno-rtti",
+    "-fno-exceptions"
+  ],
+  "ldflags": [
+    "-g",
+    "-L/opt/devkitpro/libnx/lib",
+    "--nx-module-name",
+    "--gc-sections",
+    "-z","text",
+    "-z", "nodynamic-undefined-weak",
+    "--build-id=sha1"
+  ],
+  "extra-files": [
+    "targets/nintendo-switch.s",
+    "targets/nintendo-switch-svc.s",
+    "src/runtime/scheduler_arm64.S"
+  ],
+  "linkerscript": "targets/nintendo-switch.ld"
+}

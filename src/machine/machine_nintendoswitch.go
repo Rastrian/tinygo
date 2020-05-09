@@ -1,7 +1,8 @@
-// +build !baremetal
-// +build !nintendoswitch
+// +build nintendoswitch
 
 package machine
+
+type PinMode uint8
 
 // Dummy machine package that calls out to external functions.
 
@@ -10,8 +11,6 @@ var (
 	I2C0  = I2C{0}
 	UART0 = UART{0}
 )
-
-type PinMode uint8
 
 const (
 	PinInput PinMode = iota
@@ -32,14 +31,17 @@ func (p Pin) Get() bool {
 	return gpioGet(p)
 }
 
-//export __tinygo_gpio_configure
-func gpioConfigure(pin Pin, config PinConfig)
+func gpioConfigure(pin Pin, config PinConfig) {
 
-//export __tinygo_gpio_set
-func gpioSet(pin Pin, value bool)
+}
 
-//export __tinygo_gpio_get
-func gpioGet(pin Pin) bool
+func gpioSet(pin Pin, value bool) {
+
+}
+
+func gpioGet(pin Pin) bool {
+	return false
+}
 
 type SPI struct {
 	Bus uint8
@@ -54,19 +56,20 @@ type SPIConfig struct {
 }
 
 func (spi SPI) Configure(config SPIConfig) {
-	spiConfigure(spi.Bus, config.SCK, config.MOSI, config.MISO)
+
 }
 
-// Transfer writes/reads a single byte using the SPI interface.
 func (spi SPI) Transfer(w byte) (byte, error) {
-	return spiTransfer(spi.Bus, w), nil
+	return 0, nil
 }
 
-//export __tinygo_spi_configure
-func spiConfigure(bus uint8, sck Pin, mosi Pin, miso Pin)
+func spiConfigure(bus uint8, sck Pin, mosi Pin, miso Pin) {
 
-//export __tinygo_spi_transfer
-func spiTransfer(bus uint8, w uint8) uint8
+}
+
+func spiTransfer(bus uint8, w uint8) uint8 {
+	return 0
+}
 
 // InitADC enables support for ADC peripherals.
 func InitADC() {
@@ -82,8 +85,9 @@ func (adc ADC) Get() uint16 {
 	return adcRead(adc.Pin)
 }
 
-//export __tinygo_adc_read
-func adcRead(pin Pin) uint16
+func adcRead(pin Pin) uint16 {
+	return 0
+}
 
 // InitPWM enables support for PWM peripherals.
 func InitPWM() {
@@ -91,17 +95,17 @@ func InitPWM() {
 }
 
 // Configure configures a PWM pin for output.
-func (pwm PWM) Configure() error {
-	return nil
+func (pwm PWM) Configure() {
 }
 
 // Set turns on the duty cycle for a PWM pin using the provided value.
 func (pwm PWM) Set(value uint16) {
-	pwmSet(pwm.Pin, value)
+
 }
 
-//export __tinygo_pwm_set
-func pwmSet(pin Pin, value uint16)
+func pwmSet(pin Pin, value uint16) {
+
+}
 
 // I2C is a generic implementation of the Inter-IC communication protocol.
 type I2C struct {
@@ -117,21 +121,21 @@ type I2CConfig struct {
 
 // Configure is intended to setup the I2C interface.
 func (i2c I2C) Configure(config I2CConfig) {
-	i2cConfigure(i2c.Bus, config.SCL, config.SDA)
+
 }
 
 // Tx does a single I2C transaction at the specified address.
 func (i2c I2C) Tx(addr uint16, w, r []byte) error {
-	i2cTransfer(i2c.Bus, &w[0], len(w), &r[0], len(r))
-	// TODO: do something with the returned error code.
 	return nil
 }
 
-//export __tinygo_i2c_configure
-func i2cConfigure(bus uint8, scl Pin, sda Pin)
+func i2cConfigure(bus uint8, scl Pin, sda Pin) {
 
-//export __tinygo_i2c_transfer
-func i2cTransfer(bus uint8, w *byte, wlen int, r *byte, rlen int) int
+}
+
+func i2cTransfer(bus uint8, w *byte, wlen int, r *byte, rlen int) int {
+	return 0
+}
 
 type UART struct {
 	Bus uint8
@@ -165,22 +169,16 @@ func (uart UART) Buffered() int {
 
 // ReadByte reads a single byte from the UART.
 func (uart UART) ReadByte() (byte, error) {
-	var b byte
-	uartRead(uart.Bus, &b, 1)
-	return b, nil
+	return 0, nil
 }
 
 // WriteByte writes a single byte to the UART.
 func (uart UART) WriteByte(b byte) error {
-	uartWrite(uart.Bus, &b, 1)
 	return nil
 }
 
-//export __tinygo_uart_configure
-func uartConfigure(bus uint8, tx Pin, rx Pin)
+func uartConfigure(bus uint8, tx Pin, rx Pin) {}
 
-//export __tinygo_uart_read
-func uartRead(bus uint8, buf *byte, bufLen int) int
+func uartRead(bus uint8, buf *byte, bufLen int) int { return 0 }
 
-//export __tinygo_uart_write
-func uartWrite(bus uint8, buf *byte, bufLen int) int
+func uartWrite(bus uint8, buf *byte, bufLen int) int { return 0 }

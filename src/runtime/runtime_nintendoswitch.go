@@ -1,26 +1,20 @@
-// +build darwin linux,!baremetal freebsd,!baremetal
-// +build !nintendoswitch
+// +build nintendoswitch
 
 package runtime
-
-import (
-	"unsafe"
-)
-
-//export putchar
-func _putchar(c int) int
 
 //export usleep
 func usleep(usec uint) int
 
-//export malloc
-func malloc(size uintptr) unsafe.Pointer
-
 //export abort
-func abort()
+func abort() {
+	for {
+	}
+}
 
 //export exit
-func exit(code int)
+func exit(code int) {
+
+}
 
 //export clock_gettime
 func clock_gettime(clk_id int32, ts *timespec)
@@ -53,7 +47,7 @@ func main() int {
 }
 
 func putchar(c byte) {
-	_putchar(int(c))
+	//
 }
 
 const asyncScheduler = false
@@ -74,15 +68,3 @@ func monotime() uint64 {
 func ticks() timeUnit {
 	return timeUnit(monotime())
 }
-
-//go:linkname syscall_Exit syscall.Exit
-func syscall_Exit(code int) {
-	exit(code)
-}
-
-func extalloc(size uintptr) unsafe.Pointer {
-	return malloc(size)
-}
-
-//export free
-func extfree(ptr unsafe.Pointer)
