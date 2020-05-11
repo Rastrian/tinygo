@@ -1,4 +1,4 @@
-// +build baremetal wasm nintendoswitch
+// +build baremetal wasm
 
 package os
 

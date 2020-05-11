@@ -4,23 +4,28 @@
 
 package runtime
 
-var heapStart, heapEnd uintptr
+import "unsafe"
+
+const heapSize = 16 * 1024 * 1024
+
+//go:extern _stack_top
+var stackTopSymbol [0]byte
+
+var (
+	heapStart = uintptr(0)
+	heapEnd   = uintptr(0)
+	stackTop  = uintptr(unsafe.Pointer(&stackTopSymbol))
+	//stackSize    = uint64(0)
+	//memTotal     = uint64(0)
+)
 
 func preinit() {
-	size := uint64(0x2000000 * 16)
-	memTotal, _ := SvcGetInfo(InfoType_TotalMemorySize, CUR_PROCESS_HANDLE, 0)
-	memUsed, _ := SvcGetInfo(InfoType_UsedMemorySize, CUR_PROCESS_HANDLE, 0)
+	heapStart = uintptr(libc_malloc(heapSize))
 
-	if memTotal > memUsed+0x200000 {
-		size = (memTotal - memUsed - 0x200000) & ^uint64(0x1FFFFF)
-	}
-
-	outAddr, result := SvcSetHeapSize(size)
-
-	if result != ResultOK {
+	if heapStart == 0 {
+		svcBreak(0x1, 0, 0)
 		panic("Cannot allocate heap")
 	}
 
-	heapStart = outAddr
-	heapEnd = heapStart + uintptr(size)
+	heapEnd = heapStart + heapSize
 }

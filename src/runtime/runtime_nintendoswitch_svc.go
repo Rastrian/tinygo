@@ -1,4 +1,10 @@
+// +build nintendoswitch
+
 package runtime
+
+import (
+	"unsafe"
+)
 
 //
 // Nintendo Switch - Horizon System Calls
@@ -7,13 +13,16 @@ package runtime
 
 const (
 	// Pseudo handle representing an invalid object
-	INVALID_HANDLE = 0
+	InvalidHandle = 0
 
 	// Pseudo handle for the current process.
-	CUR_PROCESS_HANDLE = 0xFFFF8001
+	CurProcessHandle = 0xFFFF8001
 
 	// Pseudo handle for the current thread.
-	CUR_THREAD_HANDLE = 0xFFFF8000
+	CurThreadHandle = 0xFFFF8000
+
+	// Maximum number of objects that can be waited on by \ref svcWaitSynchronization (Horizon kernel limitation).
+	MaxWaitObjects = 0x40
 )
 
 // InfoType Types of information to use on SvcGetInfo System Call
@@ -61,10 +70,64 @@ const (
 // handle Handle of the object to retrieve information from, or INVALID_HANDLE to retrieve information about the system.
 // Syscall number 0x29
 //go:export svcGetInfo
-func SvcGetInfo(infoType InfoType, handle uint32, id1 uint64) (value uint64, result Result)
+func _SvcGetInfo(outPtr unsafe.Pointer, infoType InfoType, handle uint32, id1 uint64) Result
 
 // SvcSetHeapSize  Set the process heap to a given size. It can both extend and shrink the heap.
 // size Size of the heap, must be a multiple of 0x2000000 and [2.0.0+] less than 0x18000000.
 // Syscall number 0x01.
 //go:export svcSetHeapSize
 func SvcSetHeapSize(size uint64) (outAddr uintptr, result Result)
+
+func SvcGetInfo(infoType InfoType, handle uint32, id1 uint64) (value uint64, result Result) {
+	r := _SvcGetInfo(unsafe.Pointer(&value), infoType, handle, id1)
+	return value, r
+}
+
+// Result svcOutputDebugString(const char *str, u64 size)
+//go:export svcOutputDebugString
+func _SvcOutputDebugString(str unsafe.Pointer, size uint64) Result
+
+func OutputDebugChar(v byte) {
+	_SvcOutputDebugString(unsafe.Pointer(&v), 1)
+}
+
+// Result svcBreak(u32 breakReason, u64 inval1, u64 inval2);
+//go:export svcBreak
+func svcBreak(reason uint32, a, b uint64)
+
+//go:export consoleInit
+func consoleInit(c unsafe.Pointer)
+
+//go:export printf
+func libc_printf(char unsafe.Pointer, val uint64)
+
+// (int fd, const void *buf, size_t cnt)
+//go:export write
+func libc_write(fd int, buffer unsafe.Pointer, size uint64) int
+
+func printf(data string, val uint64) {
+	libc_printf(unsafe.Pointer((*_string)(unsafe.Pointer(&data)).ptr), val)
+}
+
+//go:export appletMainLoop
+func appletMainLoop() bool
+
+//go:export consoleUpdate
+func consoleUpdate(c unsafe.Pointer)
+
+//go:export consoleExit
+func consoleExit(c unsafe.Pointer)
+
+//go:export hidScanInput
+func hidScanInput()
+
+//u64 hidKeysDown(HidControllerID id);
+//go:export hidKeysDown
+func hidKeysDown(id uint64) uint64
+
+// void *malloc(size_t size);
+//go:export malloc
+func libc_malloc(size uint64) unsafe.Pointer
+
+//go:export __nx_exit
+func __nx_exit(code int)

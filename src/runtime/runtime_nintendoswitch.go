@@ -7,14 +7,11 @@ func usleep(usec uint) int
 
 //export abort
 func abort() {
-	for {
-	}
+	exit(1)
 }
 
-//export exit
-func exit(code int) {
-
-}
+//go:export exit
+func exit(code int) int
 
 //export clock_gettime
 func clock_gettime(clk_id int32, ts *timespec)
@@ -39,15 +36,13 @@ func postinit() {}
 //export main
 func main() int {
 	preinit()
-
 	run()
 
-	// For libc compatibility.
-	return 0
+	return exit(0) // Call libc_exit to cleanup libnx
 }
 
 func putchar(c byte) {
-	//
+	OutputDebugChar(c)
 }
 
 const asyncScheduler = false
