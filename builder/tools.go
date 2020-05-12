@@ -2,10 +2,9 @@ package builder
 
 import (
 	"errors"
+	"github.com/tinygo-org/tinygo/goenv"
 	"os"
 	"os/exec"
-
-	"github.com/tinygo-org/tinygo/goenv"
 )
 
 // runCCompiler invokes a C compiler with the given arguments.

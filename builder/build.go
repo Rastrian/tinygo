@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -183,7 +184,16 @@ func Build(pkgName, outpath string, config *compileopts.Config, action func(stri
 		root := goenv.Get("TINYGOROOT")
 		// If Nintendo Switch, add libnx
 		if isNintendoSwitch {
-			ldflags = append(ldflags, "-L"+root+"/lib/libnx/nx/lib", "-lnx")
+			// Use devKitPro
+			dkp := os.Getenv("DEVKITPRO")
+			if dkp == "" {
+				return &commandError{"Nintendo Switch requires devKitPro. Check https://switchbrew.org/wiki/Setting_up_Development_Environment", config.Target.Linker, fmt.Errorf("DEVKITPRO environment not found")}
+			}
+
+			config.Target.Linker = path.Join(dkp, "devkitA64", "bin", "aarch64-none-elf-gcc")
+			libnxpath := path.Join(dkp, "libnx")
+			ldflags = append(ldflags, "-L"+path.Join(libnxpath, "lib"), "-lnx")
+			ldflags = append(ldflags, "-specs="+path.Join(libnxpath, "switch.specs"))
 		}
 
 		// Add libc.

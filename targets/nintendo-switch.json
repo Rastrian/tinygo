@@ -6,7 +6,7 @@
   "compiler": "aarch64-none-elf-gcc",
   "linker": "aarch64-none-elf-gcc",
   "rtlib": "none",
-  "libc": "switchlibc",
+  "libc": "none",
   "gc": "conservative",
   "cflags": [
     "-march=armv8-a+crc+crypto",
@@ -21,7 +21,6 @@
     "-fno-exceptions"
   ],
   "ldflags": [
-    "-specs={root}/lib/libnx/nx/switch.specs",
     "-fPIE",
     "-g",
     "-march=armv8-a+crc+crypto",
