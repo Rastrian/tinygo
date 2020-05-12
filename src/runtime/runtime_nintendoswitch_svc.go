@@ -109,25 +109,15 @@ func printf(data string, val uint64) {
 	libc_printf(unsafe.Pointer((*_string)(unsafe.Pointer(&data)).ptr), val)
 }
 
-//go:export appletMainLoop
-func appletMainLoop() bool
-
-//go:export consoleUpdate
-func consoleUpdate(c unsafe.Pointer)
-
-//go:export consoleExit
-func consoleExit(c unsafe.Pointer)
-
-//go:export hidScanInput
-func hidScanInput()
-
-//u64 hidKeysDown(HidControllerID id);
-//go:export hidKeysDown
-func hidKeysDown(id uint64) uint64
-
 // void *malloc(size_t size);
 //go:export malloc
 func libc_malloc(size uint64) unsafe.Pointer
 
 //go:export __nx_exit
 func __nx_exit(code int)
+
+//go:export malloc
+func extalloc(size uintptr) unsafe.Pointer
+
+//export free
+func extfree(ptr unsafe.Pointer)

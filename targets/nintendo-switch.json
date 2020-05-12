@@ -7,7 +7,7 @@
   "linker": "aarch64-none-elf-gcc",
   "rtlib": "none",
   "libc": "none",
-  "gc": "conservative",
+  "gc": "extalloc",
   "cflags": [
     "-march=armv8-a+crc+crypto",
     "-mtune=cortex-a57",
