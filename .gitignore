@@ -14,4 +14,3 @@ src/device/stm32/*.s
 vendor
 llvm-build
 llvm-project
-.idea
