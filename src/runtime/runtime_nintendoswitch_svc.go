@@ -95,26 +95,9 @@ func OutputDebugChar(v byte) {
 //go:export svcBreak
 func svcBreak(reason uint32, a, b uint64)
 
-//go:export consoleInit
-func consoleInit(c unsafe.Pointer)
-
-//go:export printf
-func libc_printf(char unsafe.Pointer, val uint64)
-
-// (int fd, const void *buf, size_t cnt)
-//go:export write
-func libc_write(fd int, buffer unsafe.Pointer, size uint64) int
-
-func printf(data string, val uint64) {
-	libc_printf(unsafe.Pointer((*_string)(unsafe.Pointer(&data)).ptr), val)
-}
-
 // void *malloc(size_t size);
 //go:export malloc
 func libc_malloc(size uint64) unsafe.Pointer
-
-//go:export __nx_exit
-func __nx_exit(code int)
 
 //go:export malloc
 func extalloc(size uintptr) unsafe.Pointer
