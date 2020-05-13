@@ -20,6 +20,3 @@
 [submodule "lib/picolibc"]
 	path = lib/picolibc
 	url = https://github.com/keith-packard/picolibc.git
-[submodule "lib/libnx"]
-	path = lib/libnx
-	url = https://github.com/switchbrew/libnx
