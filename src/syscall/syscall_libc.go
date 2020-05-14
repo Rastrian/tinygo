@@ -59,7 +59,7 @@ func Unlink(path string) (err error) {
 	return notImplemented // TODO
 }
 
-func Kill(pid int, sig int) (err error) {
+func Kill(pid int, sig Signal) (err error) {
 	return notImplemented // TODO
 }
 
