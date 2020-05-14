@@ -8,6 +8,13 @@ type stringer interface {
 	String() string
 }
 
+//go:nobounds
+func printstring(s string) {
+	for i := 0; i < len(s); i++ {
+		putchar(s[i])
+	}
+}
+
 func printuint8(n uint8) {
 	if TargetBits >= 32 {
 		printuint32(uint32(n))

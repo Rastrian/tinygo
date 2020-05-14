@@ -41,10 +41,6 @@ func main() int {
 	return exit(0) // Call libc_exit to cleanup libnx
 }
 
-func putchar(c byte) {
-	OutputDebugChar(c)
-}
-
 const asyncScheduler = false
 
 func sleepTicks(d timeUnit) {
@@ -62,4 +58,16 @@ func monotime() uint64 {
 
 func ticks() timeUnit {
 	return timeUnit(monotime())
+}
+
+var stdoutBuffer = make([]byte, 0, 120)
+
+func putchar(c byte) {
+	if c == '\n' || len(stdoutBuffer)+1 >= 120 {
+		svcOutputDebugString(&stdoutBuffer[0], uint64(len(stdoutBuffer)))
+		stdoutBuffer = stdoutBuffer[:0]
+		return
+	}
+
+	stdoutBuffer = append(stdoutBuffer, c)
 }
