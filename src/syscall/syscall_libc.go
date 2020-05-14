@@ -17,7 +17,7 @@ type Signal int
 func Close(fd int) (err error) {
 	errN := libc_close(int32(fd))
 	if errN != 0 {
-		return fmt.Errorf("error %d", errN)
+		return errors.New("error closing fd") // TODO: Return errno
 	}
 	return nil
 }
