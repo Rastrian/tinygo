@@ -1,5 +1,4 @@
 // +build !baremetal
-// +build !nintendoswitch
 
 package machine
 
