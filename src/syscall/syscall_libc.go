@@ -97,7 +97,7 @@ func libc_write(fd int32, buffer *byte, size uint) int
 func libc_read(fd int32, buffer *byte, size uint) int
 
 // int close(int fd);
-//go:export read
+//go:export close
 func libc_close(fd int32) int
 
 // int open(const char *pathname, int flags, mode_t mode);
