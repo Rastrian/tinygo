@@ -4,15 +4,12 @@ package syscall
 
 import (
 	"errors"
-	"fmt"
 	"unsafe"
 )
 
 var (
 	notImplemented = errors.New("os: not implemented")
 )
-
-type Signal int
 
 func Close(fd int) (err error) {
 	errN := libc_close(int32(fd))
@@ -22,19 +19,11 @@ func Close(fd int) (err error) {
 	return nil
 }
 
-// getErrno returns the current C errno. It may not have been caused by the last
-// call, so it should only be relied upon when the last call indicates an error
-// (for example, by returning -1).
-func getErrno() Errno {
-	errptr := libc__errno()
-	return Errno(errptr)
-}
-
 func Write(fd int, p []byte) (n int, err error) {
 	buf, count := splitSlice(p)
 	n = libc_write(int32(fd), buf, uint(count))
 	if n < 0 {
-		err = getErrno()
+		err = errors.New("error writing to fd") // TODO: Return errno
 	}
 	return
 }
@@ -43,36 +32,34 @@ func Read(fd int, p []byte) (n int, err error) {
 	buf, count := splitSlice(p)
 	n = libc_read(int32(fd), buf, uint(count))
 	if n < 0 {
-		err = getErrno()
+		err = errors.New("error reading from fd") // TODO: Return errno
 	}
 	return
 }
 
 func Seek(fd int, offset int64, whence int) (off int64, err error) {
-	off = libc_lseek(int32(fd), offset, whence)
-
-	return off, nil
+	return libc_lseek(int32(fd), offset, whence), nil
 }
 
 func Open(path string, mode int, perm uint32) (fd int, err error) {
 	buf, _ := splitString(path)
 	fd = libc_open(buf, uint(mode), uint(perm))
 	if fd < 0 {
-		err = getErrno()
+		err = errors.New("error opening path") // TODO: Return errno
 	}
 
 	return
 }
 
 func Mkdir(path string, mode uint32) (err error) {
-	return ENOSYS // TODO
+	return notImplemented // TODO
 }
 
 func Unlink(path string) (err error) {
-	return ENOSYS // TODO
+	return notImplemented // TODO
 }
 
-func Kill(pid int, sig Signal) (err error) {
+func Kill(pid int, sig int) (err error) {
 	return notImplemented // TODO
 }
 
@@ -119,6 +106,3 @@ func libc_open(pathname *byte, flags uint, mode uint) int
 
 //go:export lseek
 func libc_lseek(fd int32, offset int64, whence int) int64
-
-//go:export __errno
-func libc__errno() uintptr
