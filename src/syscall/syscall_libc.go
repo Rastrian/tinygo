@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	notImplemented = errors.New("os: not implemented")
+	notImplemented = errors.New("syscall: not implemented")
 )
 
 func Close(fd int) (err error) {
