@@ -201,7 +201,7 @@ func Compile(pkgName string, machine llvm.TargetMachine, config *compileopts.Con
 					return path
 				} else if path == "syscall" {
 					for _, tag := range c.BuildTags() {
-						if tag == "baremetal" || tag == "darwin" {
+						if tag == "baremetal" || tag == "darwin" || tag == "nintendoswitch" {
 							return path
 						}
 					}
