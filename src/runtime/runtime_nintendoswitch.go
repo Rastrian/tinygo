@@ -2,33 +2,11 @@
 
 package runtime
 
-//export usleep
-func usleep(usec uint) int
-
-//export abort
-func abort() {
-	exit(1)
-}
-
-//go:export exit
-func exit(code int) int
-
-//export clock_gettime
-func clock_gettime(clk_id int32, ts *timespec)
-
 type timeUnit int64
 
-const tickMicros = 1
+const tickMicros = 1000 // (1000 * 625) / 12
+const asyncScheduler = false
 
-// Note: tv_sec and tv_nsec vary in size by platform. They are 32-bit on 32-bit
-// systems and 64-bit on 64-bit systems (at least on macOS/Linux), so we can
-// simply use the 'int' type which does the same.
-type timespec struct {
-	tv_sec  int // time_t: follows the platform bitness
-	tv_nsec int // long: on Linux and macOS, follows the platform bitness
-}
-
-const CLOCK_MONOTONIC_RAW = 4
 
 func postinit() {}
 
@@ -41,23 +19,31 @@ func main() int {
 	return exit(0) // Call libc_exit to cleanup libnx
 }
 
-const asyncScheduler = false
 
+// sleepTicks argument are actually in microseconds
 func sleepTicks(d timeUnit) {
-	usleep(uint(d) / 1000)
+	usleep(uint(d))
 }
 
-// Return monotonic time in nanoseconds.
-//
-// TODO: noescape
-func monotime() uint64 {
-	ts := timespec{}
-	clock_gettime(CLOCK_MONOTONIC_RAW, &ts)
-	return uint64(ts.tv_sec)*1000*1000*1000 + uint64(ts.tv_nsec)
+// getArmSystemTimeNs returns ARM cpu ticks converted to nanoseconds
+func getArmSystemTimeNs() uint64 {
+	t := getArmSystemTick()
+	return armTicksToNs(t)
+}
+
+// armTicksToNs converts cpu ticks to nanoseconds
+// Nintendo Switch CPU ticks has a fixed rate at 19200000
+// It is basically 52 ns per tick
+func armTicksToNs(tick uint64) uint64 {
+	return tick * 52
+}
+
+func armNsToTicks(ns int64) int64 {
+	return ns / 52
 }
 
 func ticks() timeUnit {
-	return timeUnit(monotime())
+	return timeUnit(getArmSystemTimeNs())
 }
 
 var stdoutBuffer = make([]byte, 0, 120)
@@ -71,3 +57,22 @@ func putchar(c byte) {
 
 	stdoutBuffer = append(stdoutBuffer, c)
 }
+
+//export usleep
+func usleep(usec uint) int
+
+//export abort
+func abort() {
+	exit(1)
+}
+
+//go:export exit
+func exit(code int) int
+
+//go:export armGetSystemTick
+func getArmSystemTick() uint64
+
+// armGetSystemTickFreq returns the system tick frequency
+// means how many ticks per second
+//go:export armGetSystemTickFreq
+func armGetSystemTickFreq() uint64
