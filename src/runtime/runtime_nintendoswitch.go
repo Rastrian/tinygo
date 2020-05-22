@@ -7,7 +7,6 @@ type timeUnit int64
 const tickMicros = 1000 // (1000 * 625) / 12
 const asyncScheduler = false
 
-
 func postinit() {}
 
 // Entry point for Go. Initialize all packages and call main.main().
@@ -18,7 +17,6 @@ func main() int {
 
 	return exit(0) // Call libc_exit to cleanup libnx
 }
-
 
 // sleepTicks argument are actually in microseconds
 func sleepTicks(d timeUnit) {
